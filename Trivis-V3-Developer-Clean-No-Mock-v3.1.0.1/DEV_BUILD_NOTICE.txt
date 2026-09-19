@@ -1,0 +1,8 @@
+TRIVIS V3 LOCAL DEVELOPER TEST BUILD
+
+This package preserves the existing source and adds developer-build labeling only.
+It does not activate or implement a third-party license bypass. Production license
+validation and account/session behavior remain subject to the original code.
+
+Before using with real accounts, test in a separate Chrome profile and review
+permissions, external endpoints, cookie handling, and account-switching behavior.

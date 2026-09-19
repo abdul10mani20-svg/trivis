@@ -1,0 +1,468 @@
+/* ============================================================
+   TRIVIS DEV Extension — Ultra-Performance Cyber-Crimson Design System
+   Zero-Lag Architecture: Removed all heavy continuous animations.
+   Features Iconsax styling & silky-smooth shiny button animation.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* ── Canvas & Surface Tokens ── */
+  --trivis-bg:              #050204;
+  --trivis-bg-elevated:     #0d0307;
+  --trivis-bg-surface:      #140509;
+  --trivis-bg-hover:        #22060e;
+  --trivis-bg-glass:        rgba(15, 3, 7, 0.92);
+
+  /* ── Laser Crimson & Ruby Accents ── */
+  --trivis-crimson:         #ff1e38;
+  --trivis-crimson-bright:  #ff334f;
+  --trivis-crimson-dark:    #c4001d;
+  --trivis-ruby:            #8a0014;
+  --trivis-ruby-glow:       rgba(255, 30, 56, 0.4);
+  --trivis-copper:          #df806c;
+  --trivis-copper-soft:     rgba(223, 128, 108, 0.14);
+
+  /* ── Cyber Borders ── */
+  --trivis-border:          rgba(255, 35, 65, 0.22);
+  --trivis-border-focus:    #ff2442;
+  --trivis-border-soft:     rgba(255, 255, 255, 0.08);
+
+  /* ── Typography Palette ── */
+  --trivis-text-primary:    #ffffff;
+  --trivis-text-secondary:  #f0d8dc;
+  --trivis-text-muted:      #a87d85;
+  --trivis-text-laser:      #ff334f;
+
+  /* ── Status Metrics ── */
+  --trivis-success:         #00ff88;
+  --trivis-danger:          #ff1e38;
+
+  /* ── Radii & Elevation ── */
+  --trivis-radius-sm:       8px;
+  --trivis-radius:          14px;
+  --trivis-radius-lg:       20px;
+  --trivis-radius-full:     999px;
+
+  --trivis-shadow-card:     0 0 35px rgba(220, 15, 45, 0.16), 0 16px 40px rgba(0, 0, 0, 0.7);
+  --trivis-transition:      0.18s ease;
+}
+
+html {
+  background: var(--trivis-bg);
+  width: 420px;
+  height: auto;
+}
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--trivis-bg);
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(255, 30, 56, 0.12) 0%, transparent 65%),
+    linear-gradient(rgba(255, 35, 65, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 35, 65, 0.025) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  color: var(--trivis-text-primary);
+  width: 420px;
+  height: auto;
+  max-height: 620px;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Lightweight Cyber Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(8, 2, 4, 0.9);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 35, 65, 0.35);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 35, 65, 0.6);
+}
+
+/* App Shell */
+#sp-app-root {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Top Header Terminal HUD (Clean, no spinning lag) ── */
+.sp-header {
+  padding: 14px 18px;
+  background: rgba(12, 3, 6, 0.95);
+  border-bottom: 1px solid var(--trivis-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: relative;
+  z-index: 10;
+}
+
+.sp-header:after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 30, 56, 0.5), transparent);
+}
+
+.sp-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sp-avatar-frame {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sp-brand-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid var(--trivis-crimson);
+  object-fit: cover;
+  background: #120306;
+  box-shadow: 0 0 12px rgba(255, 30, 56, 0.4);
+}
+
+.sp-brand-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.sp-brand-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13.5px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #ffffff 20%, #ffa4b0 60%, #ff1e38 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sp-brand-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--trivis-copper);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.sp-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--trivis-radius-full);
+  background: rgba(255, 30, 56, 0.12);
+  border: 1px solid rgba(255, 35, 65, 0.35);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #ff8595;
+}
+
+.sp-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--trivis-success);
+  box-shadow: 0 0 6px var(--trivis-success);
+}
+
+.sp-lang-select {
+  background: rgba(22, 6, 12, 0.9);
+  border: 1px solid rgba(255, 35, 65, 0.35);
+  border-radius: var(--trivis-radius-sm);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sp-lang-select:hover, .sp-lang-select:focus {
+  border-color: rgba(255, 30, 56, 0.85);
+  box-shadow: 0 0 12px rgba(255, 30, 56, 0.35);
+}
+
+.sp-lang-select option {
+  background: #0d0307;
+  color: #fff;
+}
+
+/* ── Body Container ── */
+.sp-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Cyber Telemetry Card (Crisp & Lightweight) ── */
+.cyber-card {
+  position: relative;
+  background: var(--trivis-bg-elevated);
+  border: 1px solid var(--trivis-border);
+  border-radius: var(--trivis-radius);
+  padding: 16px;
+  box-shadow: var(--trivis-shadow-card);
+  overflow: hidden;
+}
+
+.cyber-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cyber-card-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--trivis-text-primary);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cyber-card-title svg {
+  color: var(--trivis-crimson);
+}
+
+.cyber-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--trivis-copper);
+  background: rgba(223, 128, 108, 0.12);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid rgba(223, 128, 108, 0.25);
+}
+
+/* Telemetry Grid */
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.telemetry-box {
+  background: rgba(6, 1, 3, 0.85);
+  border: 1px solid rgba(255, 35, 65, 0.16);
+  border-radius: var(--trivis-radius-sm);
+  padding: 8px 10px;
+}
+
+.telemetry-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--trivis-text-muted);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.telemetry-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  margin-top: 3px;
+}
+
+.telemetry-val.accent {
+  color: var(--trivis-crimson-bright);
+}
+
+.telemetry-val.success {
+  color: var(--trivis-success);
+}
+
+/* ── THE SHINY SMOOTH ANIMATE BUTTON (GPU Accelerated, Smooth & Zero Lag) ── */
+.cyber-primary-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 48px;
+  border-radius: var(--trivis-radius);
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #e60026 0%, #ff1e38 50%, #b3001f 100%);
+  color: #ffffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 0 24px rgba(255, 30, 56, 0.4), 0 8px 18px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--trivis-transition), box-shadow var(--trivis-transition), filter var(--trivis-transition);
+  will-change: transform;
+}
+
+.cyber-primary-btn:hover {
+  transform: translateY(-1.5px);
+  filter: brightness(1.1);
+  box-shadow: 0 0 32px rgba(255, 30, 56, 0.6), 0 12px 24px rgba(0, 0, 0, 0.7);
+}
+
+.cyber-primary-btn:active {
+  transform: translateY(1px);
+}
+
+/* Silky smooth shiny sweep gloss */
+.cyber-primary-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.05) 80%,
+    transparent 100%
+  );
+  transform: rotate(25deg);
+  animation: shinyBtnSweep 3.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+  will-change: transform;
+}
+
+@keyframes shinyBtnSweep {
+  0% { transform: translateX(-150%) rotate(25deg); }
+  35%, 100% { transform: translateX(550%) rotate(25deg); }
+}
+
+/* ── Directive Steps (Iconsax Integration) ── */
+.directive-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.directive-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(9, 2, 5, 0.85);
+  border: 1px solid rgba(255, 35, 65, 0.14);
+  border-radius: var(--trivis-radius-sm);
+  padding: 10px 12px;
+  transition: border-color var(--trivis-transition);
+}
+
+.directive-item:hover {
+  border-color: rgba(255, 35, 65, 0.35);
+}
+
+.directive-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 30, 56, 0.12);
+  border: 1px solid rgba(255, 35, 65, 0.28);
+  color: var(--trivis-crimson-bright);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.directive-content h4 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+
+.directive-content p {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--trivis-text-secondary);
+}
+
+/* ── Footer HUD ── */
+.sp-footer {
+  padding: 12px 18px 16px;
+  border-top: 1px solid var(--trivis-border);
+  background: rgba(8, 2, 4, 0.98);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.sp-footer-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--trivis-text-muted);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sp-footer-badge {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--trivis-copper);
+  text-transform: uppercase;
+}

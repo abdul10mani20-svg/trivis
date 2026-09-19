@@ -1,0 +1,101 @@
+{
+  "manifest_version": 3,
+  "name": "Trivis V3 — Local Developer Test Build",
+  "version": "3.1.0.1",
+  "description": "Local developer test build. Does not grant third-party production entitlements.",
+  "author": "Trivis",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "cookies",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://*.lovable.dev/*",
+    "https://api.lovable.dev/*",
+    "https://lovable.dev/*",
+    "https://io.eklas.dev/*",
+    "https://vibedeals.shop/*",
+    "https://dawn-hill-b9bf.oxenv.workers.dev/*",
+    "https://trivis-admin-panel.vercel.app/*",
+    "https://*.lovable.app/*"
+  ],
+  "action": {
+    "default_title": "Trivis V3",
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "32": "assets/icon32.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "scripts/k9m2vx.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.lovable.dev/*",
+        "https://lovable.dev/*",
+        "https://*.lovable.app/*",
+        "https://lovable.app/*"
+      ],
+      "js": [
+        "scripts/w8r1qt.js",
+        "scripts/content/trivis-dev-mode.js",
+        "scripts/content/trivis-native-lock.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://*.lovable.dev/*",
+        "https://lovable.dev/*",
+        "https://*.lovable.app/*",
+        "https://lovable.app/*"
+      ],
+      "js": [
+        "scripts/content/trivis-chat-send.js",
+        "scripts/content/trivis-download-source.js",
+        "scripts/content/trivis-features-real.js",
+        "scripts/content/trivis-ui-polish.js",
+        "scripts/content/trivis-lic-unlock.js",
+        "scripts/content/trivis-gate.js",
+        "scripts/content/trivis-vx-bar.js",
+        "scripts/content/trivis-switch-login.js",
+        "scripts/content/trivis-global-lock.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/*",
+        "styles/*",
+        "scripts/*",
+        "index.html"
+      ],
+      "matches": [
+        "https://*.lovable.dev/*",
+        "https://lovable.dev/*",
+        "https://*.lovable.app/*",
+        "https://lovable.app/*"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; connect-src https://trivis-admin-panel.vercel.app https://*.lovable.app https://io.eklas.dev https://*.lovable.dev https://api.lovable.dev https://vibedeals.shop https://dawn-hill-b9bf.oxenv.workers.dev; img-src 'self' blob: data: https:; style-src 'self' 'unsafe-inline'; media-src 'self'"
+  },
+  "icons": {
+    "16": "assets/icon16.png",
+    "32": "assets/icon32.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  }
+}
