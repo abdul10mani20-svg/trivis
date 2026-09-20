@@ -120,7 +120,7 @@
       '<div class="field">' +
       /* Iconsax Key Icon */
       '<span class="in-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.25 10.75C14.25 8.68 12.57 7 10.5 7C8.43 7 6.75 8.68 6.75 10.75C6.75 12.82 8.43 14.5 10.5 14.5C12.57 14.5 14.25 12.82 14.25 10.75Z"/><path d="M13.25 13.5L20.5 20.75M17.5 17.75L19 19.25M15.5 15.75L17 17.25"/></svg></span>' +
-      '<input id="trivis-gate-key" placeholder="TRIVIS-PRO-XXXX-XXXX" autocomplete="off" spellcheck="false"/>' +
+      '<input id="trivis-gate-key" placeholder="LXC-XXXXX-XXXXX-XXXXX-XXXXX" autocomplete="off" spellcheck="false"/>' +
       /* Iconsax Copy/Paste Icon */
       '<button type="button" class="paste-btn" id="trivis-gate-paste" title="Paste key from clipboard">' +
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 12.9V17.1C16 20.6 14.6 22 11.1 22H6.9C3.4 22 2 20.6 2 17.1V12.9C2 9.4 3.4 8 6.9 8H11.1C14.6 8 16 9.4 16 12.9Z"/><path d="M17.1 2H12.9C9.5 2 8.1 3.3 8 6.5H11.1C15.3 6.5 17.5 8.7 17.5 12.9V16C20.7 15.9 22 14.5 22 11.1V6.9C22 3.4 20.6 2 17.1 2Z"/></svg>' +

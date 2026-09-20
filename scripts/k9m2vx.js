@@ -1,6 +1,6 @@
 /**
  * Trivis service worker bridge
- * - License validate against trivis-admin-panel.vercel.app
+ * - License validation against the public licensing service
  * - Heartbeat recheck (expire / ban / revoke → local kill)
  * - Inject freeze scripts ONLY when licensed
  * - Load original background logic via importScripts
@@ -13,12 +13,13 @@ const LOCK_MSG_KEY = "trivis_lock_message";
 const LEGACY_LOCK_FLAG_KEY = "zokys_extension_locked";
 const LEGACY_LOCK_MSG_KEY = "zokys_lock_message";
 
-const TRIVIS_API = "https://trivis-admin-panel.vercel.app/api/validate-license";
+const TRIVIS_API = "https://happy-little101.lovable.app/api/public/v1/licenses";
+const LICENSE_PRODUCT = "browser-extension-core";
 const EXTENSION_STATUS_API = "https://trivis-admin-panel.vercel.app/api/public/extension-status";
 const EXTENSION_STATUS_API_FALLBACK = "https://trivis-admin-panel.vercel.app/api/extension-status";
 const SWITCH_API = "https://trivis-admin-panel.vercel.app/api/public/switch-account";
 const SWITCH_API_FALLBACK = "https://trivis-admin-panel.vercel.app/api/switch-account";
-const KEY_RE = /^TRIVIS-[A-Z0-9]{4}-[A-Z0-9]{4}$/i;
+const KEY_RE = /^LXC-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}$/i;
 const TOKEN_KEY = "trivis_license_key";
 const OK_KEY = "trivis_lic_ok";
 const SESSION_KEY = "trivis_lic_session";
@@ -58,10 +59,14 @@ function deviceId() {
   });
 }
 
-// Developer build entitlement is intentionally local and unlocked.
-// Do not restore production license gating here. Real API/license handlers remain
-// available only for features that explicitly require a real server-issued key.
 async function isLicensed() {
+  const r = await chrome.storage.local.get([TOKEN_KEY, OK_KEY, EXP_KEY]);
+  if (!(r[OK_KEY] === true || r[OK_KEY] === "1") || !r[TOKEN_KEY]) return false;
+  if (!KEY_RE.test(String(r[TOKEN_KEY]).trim())) return false;
+  if (r[EXP_KEY]) {
+    const t = Date.parse(r[EXP_KEY]);
+    if (t && Date.now() > t) return false;
+  }
   return true;
 }
 
@@ -104,7 +109,6 @@ async function revalidateFromServer() {
 
   try {
     const dev = await deviceId();
-    const name = String(r[NAME_KEY] || "Trivis User").slice(0, 64);
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 12000);
     let resp;
@@ -112,7 +116,12 @@ async function revalidateFromServer() {
       resp = await fetch(TRIVIS_API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, deviceId: dev, name, recheck: true }),
+        body: JSON.stringify({
+          operation: "check",
+          licenseKey: key,
+          productIdentifier: LICENSE_PRODUCT,
+          deviceIdentifier: dev
+        }),
         signal: ctrl.signal
       });
     } finally {
@@ -121,40 +130,32 @@ async function revalidateFromServer() {
 
     const data = await resp.json().catch(() => null);
 
-    // Explicit invalid from server → kill session (ban / revoke / device limit)
-    if (data && data.ok === false) {
+    const status = String(data && data.status || "").toLowerCase();
+    const definitive = ["invalid", "revoked", "expired", "device_mismatch", "device_limit_reached"];
+    if (definitive.includes(status)) {
       await clearLicense();
       return {
         ok: false,
-        reason: "revoked",
-        error: data.error || data.message || "License revoked"
+        reason: status,
+        error: data.error || data.message || status
       };
     }
 
-    // HTTP hard fail that clearly means banned (401/403)
-    if (resp.status === 401 || resp.status === 403) {
-      await clearLicense();
-      return { ok: false, reason: "revoked", error: "License revoked" };
-    }
-
-    // Network / 5xx / parse fail → keep session (offline safe)
-    if (!resp.ok || !data) {
+    if (!resp.ok || !data || status !== "active" || data.valid !== true) {
       await chrome.storage.local.set({ [LAST_CHECK_KEY]: Date.now() });
       return { ok: true, reason: "network_keep" };
     }
 
-    // Server OK — refresh expiry / name if provided
     const patch = { [LAST_CHECK_KEY]: Date.now(), [OK_KEY]: true };
-    if (data.expires_at) patch[EXP_KEY] = data.expires_at;
-    if (data.user_name) patch[NAME_KEY] = data.user_name;
+    if (data.expiresAt) patch[EXP_KEY] = data.expiresAt;
     if (data.session) patch[SESSION_KEY] = data.session;
     await chrome.storage.local.set(patch);
 
     return {
       ok: true,
       reason: "revalidated",
-      expires_at: data.expires_at || r[EXP_KEY] || null,
-      name: data.user_name || r[NAME_KEY] || null
+      expires_at: data.expiresAt || r[EXP_KEY] || null,
+      name: r[NAME_KEY] || null
     };
   } catch (_) {
     // Offline / abort → keep session
@@ -556,7 +557,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         const name = String(msg.name || "").trim().slice(0, 64);
         const dev = await deviceId();
         if (!KEY_RE.test(key)) {
-          sendResponse({ ok: false, error: "Format: TRIVIS-XXXX-XXXX" });
+          sendResponse({ ok: false, error: "Format: LXC-XXXXX-XXXXX-XXXXX-XXXXX" });
           return;
         }
         const ctrl = new AbortController();
@@ -566,17 +567,32 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
           resp = await fetch(TRIVIS_API, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ key, deviceId: dev, name }),
+            body: JSON.stringify({
+              operation: "activate",
+              licenseKey: key,
+              productIdentifier: LICENSE_PRODUCT,
+              deviceIdentifier: dev
+            }),
             signal: ctrl.signal
           });
         } finally {
           clearTimeout(t);
         }
         const data = await resp.json().catch(() => null);
-        if (!data || !data.ok) {
+        const status = String(data && data.status || "").toLowerCase();
+        const definitive = ["invalid", "revoked", "expired", "device_mismatch", "device_limit_reached"];
+        if (definitive.includes(status)) {
+          await clearLicense();
           sendResponse({
             ok: false,
-            error: (data && (data.error || data.message)) || "HTTP " + resp.status
+            error: (data && (data.error || data.message)) || status
+          });
+          return;
+        }
+        if (!resp.ok || !data || data.valid !== true || status !== "active") {
+          sendResponse({
+            ok: false,
+            error: (data && (data.error || data.message)) || "License service unavailable"
           });
           return;
         }
@@ -587,15 +603,14 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
           [NAME_KEY]: data.user_name || name || "Trivis User",
           [LAST_CHECK_KEY]: Date.now()
         };
-        if (data.expires_at) patch[EXP_KEY] = data.expires_at;
+        if (data.expiresAt) patch[EXP_KEY] = data.expiresAt;
         await chrome.storage.local.set(patch);
-        try { await applyLockState(data); } catch (_) {}
         await injectFreezeAllLovableTabs();
         scheduleHeartbeat();
         sendResponse({
           ok: true,
           session: patch[SESSION_KEY],
-          expires_at: data.expires_at || null,
+          expires_at: data.expiresAt || null,
           user_name: patch[NAME_KEY],
           name: patch[NAME_KEY],
           key
@@ -613,10 +628,6 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   // Fast local status — persistent login, no key prompt
   if (msg.type === "TRIVIS_STATUS") {
     (async () => {
-      // Optional force server recheck
-      if (msg.recheck) {
-        await revalidateFromServer();
-      }
       const ok = await isLicensed();
       const r = await chrome.storage.local.get([TOKEN_KEY, NAME_KEY, EXP_KEY]);
       sendResponse({
@@ -670,7 +681,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name !== HEARTBEAT_ALARM) return;
   revalidateFromServer().then((res) => {
-    if (res && res.ok === false && (res.reason === "revoked" || res.reason === "expired")) {
+    if (res && res.ok === false && ["invalid", "revoked", "expired", "device_mismatch", "device_limit_reached"].includes(res.reason)) {
       // session cleared; next UI poll will show gate
     }
   });
